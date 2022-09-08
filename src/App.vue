@@ -2,10 +2,10 @@
 <div style="overflow:auto;">
 <v-stage :config="configKonva">
   <v-layer
-      v-for="level in levels"
+      v-for="level in levs"
      :key="level.id"
   >
-    <v-rect :config="param(level)" @click="func(level)"></v-rect>
+    <v-rect :config="param(level)" @click="func(level)" @dblclick="setFinished(level)"></v-rect>
     <v-text :config="param3(level)" @click="func(level)"></v-text>
     <v-line
         v-for="line in level.lines"
@@ -26,24 +26,29 @@ export default {
       })
     })
   },
+  computed: {
+    levs() {
+      return this.levels
+    },
+  },
   data() {
     return {
-      w: 20,
+      w: 50,
       levels: [
-        {id: 1, finished: true, faction: 1, x: 100,y: 100, lines: [], unlocked: true,
-          children: [{line: 'right', id: 2}, {line: 'down', id: 5},  ],
+        {id: 1, finished: true, faction: 1, x: 100,y: 100, lines: [], unlocked: true, unlocks: [2,5],
+          children: [{line: 'right', id: 2, connection: '1-2'}, {line: 'down', id: 5, connection: '1-5'},  ],
         },
-        {id: 2, finished: false, faction: 2,x: 300,y: 300,lines: [], unlocked: true,
-          children: [{line: 'right', id: 3}, {line: 'left', id: 1},],
+        {id: 2, finished: false, faction: 2,x: 300,y: 300,lines: [], unlocked: true, unlocks: [1,3],
+          children: [{line: 'right', id: 3, connection: '2-3'}, ],
         },
-        {id: 3, finished: false, faction: 1, x: 500,y: 400,lines: [], unlocked: false,
-          children: [{line: 'right', id: 4}, {line: 'left', id: 2}, {line: 'left', id: 5},],
+        {id: 3, finished: false, faction: 1, x: 500,y: 400,lines: [], unlocked: false, unlocks: [2,5,4],
+          children: [{line: 'right', id: 4, connection: '3-4'}, ],
         },
-        {id: 4, finished: false, faction: 3,x: 1200,y: 400,lines: [], unlocked: false,
-          children: [{line: 'left', id: 3},],
+        {id: 4, finished: false, faction: 3,x: 1200,y: 400,lines: [], unlocked: false, unlocks: [3,],
+          children: [],
         },
-        {id: 5, finished: false, faction: 1,x: 100,y: 400,lines: [], unlocked: true,
-          children: [{line: 'top', id: 1}, {line: 'right', id: 3}],
+        {id: 5, finished: false, faction: 1,x: 100,y: 400,lines: [], unlocked: true, unlocks: [1,3],
+          children: [{line: 'right', id: 3, connection: '5-3'}, ],
         },
       ],
       configKonva: { width: 1500,height: 600 },
@@ -61,14 +66,15 @@ export default {
         // stroke: item.finished ? 'green' : 'grey',
       }
     },
-    param2(arrow, level) {
+    param2(arrow) {
       return {
         x: arrow.x,
         y: arrow.y,
         points: [arrow.points[0], arrow.points[1], arrow.points[2], arrow.points[3]],
         fill: arrow.fill,
         stroke: arrow.fill,
-        strokeWidth: level.finished ? 2 : 1,
+        // strokeWidth: level.finished ? 2 : 1,
+        strokeWidth: 1,
       }
     },
     param3(level) {
@@ -82,50 +88,76 @@ export default {
       }
     },
     func(level) {
-      if (level.unlocked) alert(level.id)
-      else alert('уровень не пройден')
+      if (level.unlocked) console.log('уровень открыт')
+    },
+    setFinished(level) {
+      if (!level.unlocked) {
+        alert('Ты чо, уровень даже не открыт')
+        return
+      }
+      if (level.finished) return
+      level.finished = true
+      level.unlocks.forEach(lev => {
+        console.log('ОТКРЫЛИ УРОВЕНЬ' + this.levels[lev - 1].id)
+        this.levels[lev - 1].unlocked = true
+      })
+      this.levels.forEach(level => {
+        level.lines = []
+        level.children.forEach(ch => {
+          this.calc_line(ch, level)
+        })
+      })
+    },
+    push_line(connections, level, x1, y1, x2, y2) {
+      for (const l of connections) {
+        if (this.levels[parseInt(l) - 1].finished) {
+          level.lines.push({
+            x: x2,
+            y: y2,
+            fill: 'green',
+            points: [0, 0, x1, y1],
+          })
+          console.log('Добавили' + connections + `Линюю зеленую, уровень ${l} же открыт`)
+          return
+        }
+      }
+      level.lines.push({
+        x: x2,
+        y: y2,
+        fill: 'red',
+        points: [0, 0, x1, y1],
+      })
+      console.log('Добавили' + connections + 'Линюю серую, все дети закрыты')
     },
     calc_line(ch, level) {
+      const connections = ch.connection?.split('-')
+      if (!connections || !ch.line) return
+      let x1 = undefined
+      let y1 = undefined
+      let x2 = undefined
+      let y2 = undefined
       if (ch.line === 'right') {
-        const x = this.levels[ch.id - 1].x - level.x - this.w
-        const y = this.levels[ch.id - 1].y - level.y
-        level.lines.push({
-          x: level.x + this.w,
-          y: level.y + this.w / 2,
-          fill: level.finished ? 'green' : 'grey',
-          points: [0, 0, x, y],
-        })
+        x1 = this.levels[ch.id - 1].x - level.x - this.w
+        y1 = this.levels[ch.id - 1].y - level.y
+        x2 = level.x + this.w
+        y2 = level.y + this.w / 2
+      } else if (ch.line === 'down') {
+        x1 = this.levels[ch.id - 1].x - level.x
+        y1 = this.levels[ch.id - 1].y - level.y - this.w
+        x2 = level.x + this.w / 2
+        y2 = level.y + this.w
+      } else if (ch.line === 'left') {
+        x1 = this.levels[ch.id - 1].x - level.x + this.w
+        y1 = this.levels[ch.id - 1].y - level.y
+        x2 = level.x
+        y2 = level.y + this.w / 2
+      } else if (ch.line === 'top') {
+        x1 = this.levels[ch.id - 1].x - level.x
+        y1 = this.levels[ch.id - 1].y - level.y + this.w
+        x2 = level.x + this.w / 2
+        y2 = level.y
       }
-      if (ch.line === 'down') {
-        const x = this.levels[ch.id - 1].x - level.x
-        const y = this.levels[ch.id - 1].y - level.y - 20
-        level.lines.push({
-          x: level.x + 10,
-          y: level.y + 20,
-          fill: level.finished ? 'green' : 'grey',
-          points: [0, 0, x, y],
-        })
-      }
-      if (ch.line === 'left') {
-        const x = this.levels[ch.id - 1].x - level.x + 20
-        const y = this.levels[ch.id - 1].y - level.y
-        level.lines.push({
-          x: level.x,
-          y: level.y + 10,
-          fill: level.finished ? 'green' : 'grey',
-          points: [0, 0, x, y],
-        })
-      }
-      // if (ch.line === 'top') {
-      //   const x = this.levels[ch.id - 1].x - level.x
-      //   const y = this.levels[ch.id - 1].y - level.y + 20
-      //   level.lines.push({
-      //     x: level.x + 10,
-      //     y: level.y,
-      //     fill: level.finished ? 'green' : 'grey',
-      //     points: [0, 0, x, y],
-      //   })
-      // }
+      this.push_line(connections, level, x1, y1, x2, y2)
     },
   },
 }
