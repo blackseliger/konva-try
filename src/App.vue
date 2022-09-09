@@ -52,23 +52,77 @@ export default {
       w: 25,
       timer: 0,
       levels: [
-        {id: 1, finished: true, faction: 1, x: 25,y: 25, lines: [], unlocked: true, unlocks: [2,5],
-          children: [{line: 'right', id: 2, connection: '1-2'}, {line: 'down', id: 5, connection: '1-5'},  ],
-        },
-        {id: 2, finished: false, faction: 2,x: 300,y: 300,lines: [], unlocked: true, unlocks: [1,3],
-          children: [{line: 'right', id: 3, connection: '2-3'}, ],
-        },
-        {id: 3, finished: false, faction: 1, x: 500,y: 400,lines: [], unlocked: false, unlocks: [2,5,4],
-          children: [{line: 'right', id: 4, connection: '3-4'}, ],
-        },
-        {id: 4, finished: false, faction: 3,x: 1200,y: 400,lines: [], unlocked: false, unlocks: [3,],
-          children: [],
-        },
-        {id: 5, finished: false, faction: 1,x: 100,y: 400,lines: [], unlocked: true, unlocks: [1,3],
-          children: [{line: 'right', id: 3, connection: '5-3'}, ],
-        },
+        {id: 1, finished: false, faction: 1, x: 25,y: 25, lines: [], unlocked: true, unlocks: [2,3],
+          children: [
+            {line: 'right', id: 2, connection: '1-2'},
+            {line: 'down', id: 3, connection: '1-3'},
+          ],},
+        {id: 2, finished: false, faction: 1, x: 85,y: 25, lines: [], unlocked: false, unlocks: [8,4,5,1],
+          children: [
+            {line: 'right', id: 5, connection: '2-5'},
+            {line: 'right', id: 4, connection: '2-4'},
+            {line: 'down', id: 8, connection: '2-8'},
+          ],},
+        {id: 3, finished: false, faction: 1, x: 25,y: 85, lines: [], unlocked: false, unlocks: [8,11,1],
+          children: [
+            {line: 'right', id: 8, connection: '3-8'},
+            {line: 'down', id: 11, connection: '3-11'},
+          ], },
+        {id: 4, finished: false, faction: 1, x: 150,y: 65, lines: [], unlocked: false, unlocks: [6,2],
+          children: [{line: 'right', id: 6, connection: '4-6'},], },
+        {id: 5, finished: false, faction: 2, x: 235,y: 25, lines: [], unlocked: false, unlocks: [7,2],
+          children: [{line: 'right', id: 7, connection: '5-7'},], },
+        {id: 6, finished: false, faction: 2, x: 235,y: 85, lines: [], unlocked: false, unlocks: [9,4,7],
+          children: [
+            {line: 'down', id: 9, connection: '6-9'},
+            {line: 'right', id: 7, connection: '6-7'},
+          ], },
+        {id: 7, finished: false, faction: 1, x: 335,y: 25, lines: [], unlocked: false, unlocks: [6,5],children: [],},
+        {id: 8, finished: false, faction: 1, x: 85,y: 150, lines: [], unlocked: false, unlocks: [9,3,2],
+          children: [{line: 'right', id: 9, connection: '8-9'},],},
+        {id: 9, finished: false, faction: 1, x: 235,y: 150, lines: [], unlocked: false, unlocks: [8,6,10,12],
+          children: [
+            {line: 'right', id: 10, connection: '9-10'},
+            {line: 'down', id: 12, connection: '9-12'},
+          ],},
+        {id: 10, finished: false, faction: 2, x: 335,y: 135, lines: [], unlocked: false, unlocks: [],children: [],},
+        {id: 11, finished: false, faction: 2, x: 25,y: 215, lines: [], unlocked: false, unlocks: [3,12,19],
+          children: [
+            {line: 'right', id: 12, connection: '11-12'},
+            {line: 'down', id: 19, connection: '11-19'},
+          ],},
+        {id: 12, finished: false, faction: 1, x: 165,y: 235, lines: [], unlocked: false, unlocks: [9,11,15,13],
+          children: [
+            {line: 'right', id: 15, connection: '12-15'},
+            {line: 'down', id: 13, connection: '12-13'},
+          ],},
+        {id: 13, finished: false, faction: 1, x: 165,y: 315, lines: [], unlocked: false, unlocks: [12,16,14,19],
+          children: [
+            {line: 'right', id: 16, connection: '13-16'},
+            {line: 'down', id: 14, connection: '13-14'},
+          ],},
+        {id: 14, finished: false, faction: 2, x: 165,y: 385, lines: [], unlocked: false, unlocks: [],children: [],},
+        {id: 15, finished: false, faction: 2, x: 285,y: 215, lines: [], unlocked: false, unlocks: [12,17,16],
+          children: [
+            {line: 'right', id: 17, connection: '15-17'},
+            {line: 'down', id: 16, connection: '15-16'},
+          ],},
+        {id: 16, finished: false, faction: 1, x: 285,y: 300, lines: [], unlocked: false, unlocks: [15,17,18,13],
+          children: [
+            {line: 'right', id: 17, connection: '16-17'},
+            {line: 'down', id: 18, connection: '16-18'},
+          ],},
+        {id: 17, finished: false, faction: 1, x: 335,y: 265, lines: [], unlocked: false, unlocks: [15,16],
+          children: [],},
+        {id: 18, finished: false, faction: 1, x: 285,y: 360, lines: [], unlocked: false, unlocks: [],children: [],},
+        {id: 19, finished: false, faction: 1, x: 75,y: 315, lines: [], unlocked: false, unlocks: [11,13,20],
+          children: [
+            {line: 'right', id: 13, connection: '19-13'},
+            {line: 'down', id: 20, connection: '19-20'},
+          ],},
+        {id: 20, finished: false, faction: 2, x: 25,y: 360, lines: [], unlocked: false, unlocks: [],children: [],},
       ],
-      configKonva: { width: 1500,height: 600 },
+      configKonva: { width: 370,height: 600 },
     }
   },
   methods: {
@@ -109,26 +163,28 @@ export default {
     },
     param3(level) {
       return {
-        text: `Врагов - \n${level.id}`,
+        text: level.id,
         fontSize: 8,
         x: level.x + this.w / 4,
         y: level.y + this.w / 4,
         align: 'center',
         verticalAlign: 'middle',
-        // dragBoundFunc: this.onSwipeItem(level),
-        // dragDistance: 1,
-        // draggable:true
+        dragBoundFunc: this.onSwipeItem(level),
+        dragDistance: 0,
+        draggable:true
       }
     },
     // func(level) {
     //   if (level.unlocked) console.log('уровень открыт')
     // },
     onSwipeItem(el) {
-      alert(el.id)
+      // alert(el.id)
+      // this.timer +=1
+      // console.log(el)
+      // return el
       const this_ = this
       return function () {
         console.log('OPEN')
-        alert(el.id)
         this_.timer +=1
         return el
       }
