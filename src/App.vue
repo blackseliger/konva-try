@@ -1,12 +1,27 @@
 <template>
 <div style="overflow:auto;">
+  {{ timer }}
 <v-stage :config="configKonva">
   <v-layer
       v-for="level in levs"
      :key="level.id"
   >
-    <v-rect :config="param(level)" @click="func(level)" @dblclick="setFinished(level)"></v-rect>
-    <v-text :config="param3(level)" @click="func(level)"></v-text>
+      <v-rect
+          :config="param(level)"
+          @dblclick="setFinished(level)"
+          @dbltap="setFinished(level)"
+
+      ></v-rect>
+<!--    <v-rect-->
+<!--        :config="param4(level)"-->
+<!--        @dbltap="onSwipeItem"-->
+<!--    ></v-rect>-->
+    <v-text
+        :config="param3(level)"
+        @dblclick="setFinished(level)"
+        @dbltap="setFinished(level)"
+
+    ></v-text>
     <v-line
         v-for="line in level.lines"
         :key="line"
@@ -14,6 +29,7 @@
     ></v-line>
   </v-layer>
 </v-stage>
+<!--  <div v-for="el in [1,2,3,4]" :key="el" v-touch:hold="onSwipeItem(el)">{{ el }}</div>-->
 </div>
 </template>
 <script>
@@ -33,9 +49,10 @@ export default {
   },
   data() {
     return {
-      w: 50,
+      w: 25,
+      timer: 0,
       levels: [
-        {id: 1, finished: true, faction: 1, x: 100,y: 100, lines: [], unlocked: true, unlocks: [2,5],
+        {id: 1, finished: true, faction: 1, x: 25,y: 25, lines: [], unlocked: true, unlocks: [2,5],
           children: [{line: 'right', id: 2, connection: '1-2'}, {line: 'down', id: 5, connection: '1-5'},  ],
         },
         {id: 2, finished: false, faction: 2,x: 300,y: 300,lines: [], unlocked: true, unlocks: [1,3],
@@ -63,10 +80,23 @@ export default {
         height: this.w,
         // fill: item.faction === 1 ? 'blue' : item.faction === 2 ? 'red' : 'green',
         fill: item.finished ? 'green' : 'grey',
-        // stroke: item.finished ? 'green' : 'grey',
+        stroke: item.faction === 1 ? 'blue' : 'red',
+        // dragBoundFunc: this.onSwipeItem(item),
+        // draggable:true
       }
     },
-    param2(arrow) {
+    param4(item) {
+      return {
+        x: item.x,
+        y: item.y + this.w,
+        width: this.w,
+        height: this.w,
+        // fill: item.faction === 1 ? 'blue' : item.faction === 2 ? 'red' : 'green',
+        fill: item.finished ? 'green' : 'grey',
+        stroke: item.faction === 1 ? 'blue' : 'red',
+      }
+    },
+    param2(arrow, level) {
       return {
         x: arrow.x,
         y: arrow.y,
@@ -74,21 +104,34 @@ export default {
         fill: arrow.fill,
         stroke: arrow.fill,
         // strokeWidth: level.finished ? 2 : 1,
-        strokeWidth: 1,
+        strokeWidth: level.finished ? 3 : 1,
       }
     },
     param3(level) {
       return {
-        text: level.id,
-        fontSize: 15,
+        text: `Врагов - \n${level.id}`,
+        fontSize: 8,
         x: level.x + this.w / 4,
         y: level.y + this.w / 4,
         align: 'center',
         verticalAlign: 'middle',
+        // dragBoundFunc: this.onSwipeItem(level),
+        // dragDistance: 1,
+        // draggable:true
       }
     },
-    func(level) {
-      if (level.unlocked) console.log('уровень открыт')
+    // func(level) {
+    //   if (level.unlocked) console.log('уровень открыт')
+    // },
+    onSwipeItem(el) {
+      alert(el.id)
+      const this_ = this
+      return function () {
+        console.log('OPEN')
+        alert(el.id)
+        this_.timer +=1
+        return el
+      }
     },
     setFinished(level) {
       if (!level.unlocked) {
